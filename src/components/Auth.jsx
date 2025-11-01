@@ -8,24 +8,17 @@ const Auth = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Correct API URLs according to your backend
+    // ✅ Add "/api" to the URL to match your backend setup
     const url = isLogin
-      ? "https://ecommarce-backend-mu.vercel.app/users/login"
-      : "https://ecommarce-backend-mu.vercel.app/users/register";
+      ? "https://ecommarce-backend-mu.vercel.app/api/users/login"
+      : "https://ecommarce-backend-mu.vercel.app/api/users/register";
 
     try {
       const res = await axios.post(url, form);
 
-      // ✅ Store both token and userId after login
       if (isLogin) {
         localStorage.setItem("token", res.data.token);
-
-        // some backends also return user details; if not, store manually
-        if (res.data.user && res.data.user._id) {
-          localStorage.setItem("userId", res.data.user._id);
-        } else {
-          console.warn("⚠️ userId not found in response");
-        }
+        localStorage.setItem("userId", res.data.user?._id || "");
 
         alert("✅ Logged in successfully!");
         window.location.href = "/";
@@ -35,7 +28,7 @@ const Auth = () => {
       }
     } catch (error) {
       console.error("Auth error:", error.response?.data || error.message);
-      alert("❌ Invalid credentials or server error.");
+      alert(error.response?.data?.message || "❌ Invalid credentials or server error.");
     }
   };
 
