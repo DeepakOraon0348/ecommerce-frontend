@@ -3,18 +3,22 @@ import axios from "axios";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Add "/api" to the URL to match your backend setup
     const url = isLogin
       ? "https://ecommarce-backend-mu.vercel.app/api/users/login"
       : "https://ecommarce-backend-mu.vercel.app/api/users/register";
 
     try {
-      const res = await axios.post(url, form);
+      // Only send 'name' when registering
+      const payload = isLogin
+        ? { email: form.email, password: form.password }
+        : form;
+
+      const res = await axios.post(url, payload);
 
       if (isLogin) {
         localStorage.setItem("token", res.data.token);
@@ -40,6 +44,15 @@ const Auth = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
+            <input
+              type="text"
+              placeholder="Name"
+              className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
+            />
+          )}
           <input
             type="email"
             placeholder="Email"
